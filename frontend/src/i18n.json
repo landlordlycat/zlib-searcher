@@ -11,7 +11,7 @@
         "clear": "Clear"
       },
       "book": {
-        "id": "zlib/libgen id",
+        "id": "ID",
         "title": "Title",
         "author": "Author",
         "publisher": "Publisher",
@@ -34,10 +34,18 @@
         "last_page": "Last page",
         "next_page": "Next page",
         "previous_page": "Previous page",
-        "page": "Page {{page}}"
+        "page": "Page {{page}}",
+        "collapse": "Collapse"
       },
       "search": {
         "complex": "Complex search"
+      },
+      "settings": {
+        "title": "Settings",
+        "ipfs_gateways": "IPFS Gateways",
+        "ipfs_gateways_help": "IPFS Gateways List, line break",
+        "cancel": "Cancel",
+        "save": "Save"
       }
     }
   },
@@ -53,7 +61,7 @@
         "clear": "清空"
       },
       "book": {
-        "id": "zlib/libgen id",
+        "id": "ID",
         "title": "书名",
         "author": "作者",
         "publisher": "出版社",
@@ -76,10 +84,118 @@
         "last_page": "最后一页",
         "next_page": "下一页",
         "previous_page": "上一页",
-        "page": "第 {{page}} 页"
+        "page": "第 {{page}} 页",
+        "collapse": "收起"
       },
       "search": {
         "complex": "复杂搜索"
+      },
+      "settings": {
+        "title": "设置",
+        "ipfs_gateways": "IPFS 网关",
+        "ipfs_gateways_help": "IPFS 网关列表，一行一个",
+        "cancel": "取消",
+        "save": "保存"
+      }
+    }
+  },
+  "fr": {
+    "translation": {
+      "nav": {
+        "repository": "Dépôt GitHub",
+        "toggle_dark": "Basculer en mode sombre",
+        "toggle_light": "Basculer en mode clair",
+        "toggle_language": "Basculer la langue"
+      },
+      "input": {
+        "clear": "Effacer"
+      },
+      "book": {
+        "id": "ID",
+        "title": "Titre",
+        "author": "Auteur",
+        "publisher": "Éditeur",
+        "extension": "Extension",
+        "filesize": "Taille du fichier",
+        "language": "Langue",
+        "year": "Année",
+        "pages": "Pages",
+        "isbn": "ISBN",
+        "ipfs_cid": "CID IPFS",
+        "unknown": "Inconnu"
+      },
+      "table": {
+        "sort_asc": "Trier par ordre croissant",
+        "sort_desc": "Trier par ordre décroissant",
+        "not_sorted": "Non trié",
+        "filter": "Filtrer",
+        "no_data": "Aucune donnée",
+        "first_page": "Première page",
+        "last_page": "Dernière page",
+        "next_page": "Page suivante",
+        "previous_page": "Page précédente",
+        "page": "Page {{page}}",
+        "collapse": "Replier"
+      },
+      "search": {
+        "complex": "Recherche complexe"
+      },
+      "settings": {
+        "title": "Paramètres",
+        "ipfs_gateways": "Passerelles IPFS",
+        "ipfs_gateways_help": "Liste des passerelles IPFS, saut de ligne",
+        "cancel": "Annuler",
+        "save": "Enregistrer"
+      }
+    }
+  },
+  "it": {
+    "translation": {
+      "nav": {
+        "repository": "Repo GitHub",
+        "toggle_dark": "Modalità scura",
+        "toggle_light": "Modalità chiara",
+        "toggle_language": "Lingua"
+      },
+      "input": {
+        "clear": "pulisci"
+      },
+      "book": {
+        "id": "ID",
+        "title": "Titolo",
+        "author": "Autore",
+        "publisher": "Editore",
+        "extension": "Estensione",
+        "filesize": "Dimensione file",
+        "language": "Lingua",
+        "year": "Anno",
+        "pages": "Pagina",
+        "isbn": "ISBN",
+        "ipfs_cid": "CID IPFS",
+        "unknown": "Sconosciuto"
+      },
+      "table": {
+        "sort_asc": "Ordine crescente",
+        "sort_desc": "Ordine decrescente",
+        "not_sorted": "Non ordinato",
+        "filter": "Filtra",
+        "no_data": "Nessun dato",
+        "first_page": "Prima pagina",
+        "last_page": "Ultima pagina",
+        "next_page": "Pagina seguente",
+        "previous_page": "Pagina precedente",
+        "page": "Pagina {{page}}",
+        "collapse": "Richiudi"
+      },
+      "search": {
+        "complex": "Ricerca dettagliata"
+      },
+      "settings": {
+        "title": "Impostazioni",
+        "ipfs_gateways": "Gateway IPFS",
+        "ipfs_gateways_help": "Elenco dei gateway IPFS, interruzione di riga",
+        "cancel": "Annullamento",
+        "save": "Risparmiare"
       }
     }
   }

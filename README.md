@@ -1,55 +1,69 @@
-# zlib(libgen) searcher
+# Book Searcher
 
-[![GitHub stars](https://img.shields.io/github/stars/zu1k/zlib-searcher)](https://github.com/zu1k/zlib-searcher/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/zu1k/zlib-searcher)](https://github.com/zu1k/zlib-searcher/network)
-[![Release](https://img.shields.io/github/release/zu1k/zlib-searcher)](https://github.com/zu1k/zlib-searcher/releases)
-[![GitHub issues](https://img.shields.io/github/issues/zu1k/zlib-searcher)](https://github.com/zu1k/zlib-searcher/issues)
-[![GitHub license](https://img.shields.io/github/license/zu1k/zlib-searcher)](https://github.com/zu1k/zlib-searcher/blob/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/book-searcher-org/book-searcher)](https://github.com/book-searcher-org/book-searcher/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/book-searcher-org/book-searcher)](https://github.com/book-searcher-org/book-searcher/network)
+[![Release](https://img.shields.io/github/release/book-searcher-org/book-searcher)](https://github.com/book-searcher-org/book-searcher/releases)
+[![GitHub issues](https://img.shields.io/github/issues/book-searcher-org/book-searcher)](https://github.com/book-searcher-org/book-searcher/issues)
+[![GitHub license](https://img.shields.io/github/license/book-searcher-org/book-searcher)](https://github.com/book-searcher-org/book-searcher/blob/master/LICENSE)
 
-Search `zlib`/`libgen` index to get `ipfs_cid`.
+Create and search books index, create your private library.
 
-We don't save and provide files, we provide search.
-
-I hope everyone have a copy of the index locally, so that no need to rely on any centralized service.
-
-## Deploy with Docker
-
-```
-git clone https://github.com/zu1k/zlib-searcher.git && cd zlib-searcher
-wget https://github.com/zu1k/zlib-searcher/releases/download/0.6.0/index_0.6.zip && unzip index_0.6.zip
-docker-compose up -d
-```
-
-Now `zlib-searcher` it will listen to `0.0.0.0:7070`.
-
+We don't save and provide files, we provide books searching.
 
 ## Usage
 
-### 1. Download the pre-compiled binary from [Release](https://github.com/zu1k/zlib-searcher/releases).
+We currently offer both Desktop and Command-line versions.
 
-Or you can compile by yourself. Refer to [Build from source](#build-from-source) for instructions.
+### Desktop
 
-### 2. Download the `index` file that has been created.
+**1. Download the pre-compiled desktop installer from [Release](https://github.com/book-searcher-org/book-searcher/releases)**
 
-We will give the corresponding `index` download links for each version in the release page.
+Or you can compile by yourself. Refer to [Build from source](#build-desktop-version) section for instructions.
 
-Or you can make your own via `zlib-searcher index`.
+- Windows: Book-Searcher-desktop_version_x64.msi
+- macOS: Book-Searcher-desktop_version_x64.dmg
+- Linux:
+    - Deb: Book-Searcher-desktop_version_amd64.deb
+    - AppImage: Book-Searcher-desktop_version_amd64.AppImage
 
-Extract the `index` folder to the same level as the program, it should look like the following:
+**2. Prepare the `index`**
 
+Refer to [Prepare the index](#prepare-the-index) section for instructions.
+
+**3. Run book-searcher-desktop**
+
+Specify the `index` folder path in the settings menu.
+
+### Cli
+
+**1. Download the pre-compiled binary from [Release](https://github.com/book-searcher-org/book-searcher/releases)**
+
+Or you can compile by yourself. Refer to [Build from source](#build-cli-version) section for instructions.
+
+**2. Prepare the `index`**
+
+Refer to [Prepare the index](#prepare-the-index) section for instructions.
+
+**3. Run `book-searcher run`**
+
+It will listen to `127.0.0.1:7070`.
+
+Access http://127.0.0.1:7070/ to use webui, or you can use the [original search api](#original-search-api).
+
+### Deploy with Docker
+
+```bash
+mkdir book-searcher && cd book-searcher
+wget https://raw.githubusercontent.com/book-searcher-org/book-searcher/master/docker-compose.yml
+# Prepare the index: put csv files in the directory, and run the following command to create index
+docker-compose run --rm -v "$PWD:$PWD" -w "$PWD" book-searcher /book-searcher index -f *.csv
+# start book-searcher
+docker-compose up -d
 ```
-zlib_searcher_dir
-├── index
-│   ├── some index files...
-│   └── meta.json
-└── zlib-searcher
-```
 
-### 3. Run `zlib-searcher run`, it will listen to `127.0.0.1:7070`.
+Now `book-searcher` it will listen to `0.0.0.0:7070`.
 
-Access http://127.0.0.1:7070/ to use webui, or you can use the original api.
-
-#### original search api
+### Original Search Api
 
 You can search by the following fields:
 
@@ -59,65 +73,82 @@ You can search by the following fields:
 - extension
 - language
 - isbn
-- zlib_id
+- id
 
 Examples:
 
 - `http://127.0.0.1:7070/search?limit=30&query=余华`
 - `http://127.0.0.1:7070/search?limit=30&query=title:机器学习 extension:azw3 publisher:清华`
-- `http://127.0.0.1:7070/search?limit=30&query=zlib_id:18557063`
+- `http://127.0.0.1:7070/search?limit=30&query=id:18557063`
 - `http://127.0.0.1:7070/search?limit=30&query=isbn:9787302423287`
 
 ## Build from source
 
-### 1. Build `zlib-searcher`
+### Build Cli version
 
-First build frontend
+**1. Build frontend**
 
 ```bash
 make frontend_preinstall frontend
 ```
 
-Then build zlib-searcher
+**2. Build `book-searcher`**
 
 ```bash
 TARGET=release make
 
 # move the compiled binary to the project root directory
-mv target/release/zlib-searcher .
+mv target/release/book-searcher .
 ```
 
-### 2. Build `index`
+### Build Desktop version
 
-Download `zlib_index_books.csv.zip` and `libgen_index_books.csv.zip` and extract the `csv` files to the project root directory.
+**1. Install frontend dependencies**
 
-Then run `zlib-searcher index`. You may need to `rm index/*` first.
+```bash
+make frontend_preinstall
+```
 
-If you have other csv files, you can run `zlib-searcher index -f *.csv` to index them.
+**2. Build `book-searcher-desktop`**
+
+```bash
+cargo tauri build
+```
+
+### Prepare the `index`
+
+**1. Prepare the raw data**
+
+Prepare the raw books metadata and save the `csv` files to the project root directory.
+
+The raw data is used to generate the `index`, see [Raw data](#raw-data) section for details.
+
+**2. Create `index`**
+
+You may need to `rm -rf index` first.
+
+```bash
+book-searcher index -f *.csv
+```
 
 The finally folder structure should look like this:
 
 ```
-zlib_searcher_dir // in the example above, it is project root directory.
+book_searcher_dir
 ├── index
 │   ├── some index files...
 │   └── meta.json
-└── zlib-searcher
+└── book-searcher
 ```
 
 ## Raw data
 
-We downloaded `libgen` sql and `zlib` sql and exported the necessary data from them.
+This raw data is used to generate `index`, should be a `csv` file with the following fields:
 
 ```
 id, title, author, publisher, extension, filesize, language, year, pages, isbn, ipfs_cid
 ```
 
-This raw data is used to generate our `index`, you can download the raw data from here:
-
-- [zlib_index_books.csv.zip](https://zlib.r2.zu1k.com/raw/zlib_index_books.csv.zip)
-- [libgen_index_books.csv.zip](https://zlib.r2.zu1k.com/raw/libgen_index_books.csv.zip)
-
 ## License
 
-**zlib-searcher** © [zlib-searcher's authors](https://github.com/zu1k/zlib-searcher/graphs/contributors), Released under the [MIT](./LICENSE) License.
+**book-searcher** © [The Book Searcher Authors](https://github.com/book-searcher-org/book-searcher/graphs/contributors), Released under the [BSD-3-Clause](./LICENSE) License.

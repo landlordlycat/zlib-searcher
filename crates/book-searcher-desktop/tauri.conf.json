@@ -6,8 +6,8 @@
     "distDir": "../../frontend/dist"
   },
   "package": {
-    "productName": "zLib Searcher",
-    "version": "0.1.0"
+    "productName": "Book Searcher",
+    "version": "0.8.0"
   },
   "tauri": {
     "allowlist": {
@@ -16,7 +16,7 @@
         "open": true
       },
       "dialog": {
-        "open": true        
+        "open": true
       }
     },
     "bundle": {
@@ -34,7 +34,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.zu1k.zlib-searcher",
+      "identifier": "com.github.book-searcher",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -63,7 +63,7 @@
         "fullscreen": false,
         "height": 900,
         "resizable": true,
-        "title": "zLib Searcher",
+        "title": "Book Searcher",
         "width": 1500
       }
     ]

@@ -3,9 +3,9 @@
     windows_subsystem = "windows"
 )]
 
+use book_searcher_core::{Book, Searcher};
 use log::info;
 use std::{error::Error, path::PathBuf};
-use zlib_searcher_core::{Book, Searcher};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -13,14 +13,12 @@ use serde::{Deserialize, Serialize};
 use tauri::State;
 use tokio::sync::Mutex;
 
+#[non_exhaustive]
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(default)]
 struct AppConfig {
-    /// Index files of z-library
     pub index_dir: PathBuf,
-    /// IPFS daemon RPC address
-    pub ipfs_api_url: String,
-    /// Where to store downloaded files
-    pub download_path: PathBuf,
+    pub ipfs_gateways: Vec<String>,
 }
 
 fn get_dir(name: &str) -> Option<PathBuf> {
@@ -33,17 +31,15 @@ fn get_dir(name: &str) -> Option<PathBuf> {
 impl Default for AppConfig {
     fn default() -> Self {
         let index_dir = get_dir("index").unwrap_or_else(|| PathBuf::from("index"));
-        let download_path = get_dir("download").unwrap_or_else(|| PathBuf::from("download"));
         Self {
             index_dir,
-            ipfs_api_url: "http://localhost:5001".to_string(),
-            download_path,
+            ipfs_gateways: vec![],
         }
     }
 }
 
 impl AppConfig {
-    const APP_NAME: &'static str = "zlib-searcher-desktop";
+    const APP_NAME: &'static str = "book-searcher-desktop";
 
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
         let config = confy::load(Self::APP_NAME, None)?;

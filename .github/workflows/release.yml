@@ -1,0 +1,80 @@
+name: Build Releases
+on:
+  release:
+    types: [published]
+
+env:
+  CARGO_TERM_COLOR: always
+  AUTH_SERVER_IP: ${{ secrets.AUTH_SERVER_IP }}
+
+
+jobs:
+  make_dist:
+    name: Build Release on (${{ matrix.platform }})
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-20.04, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install dependencies
+        run: |
+          make frontend_preinstall
+      - name: Build dist
+        run: |
+          make frontend
+      - name: Build on Linux
+        if: matrix.platform == 'ubuntu-20.04'
+        run: |
+          cargo install cross
+          make releases
+      - name: Build on MacOS
+        if: matrix.platform == 'macos-latest'
+        run: |
+          mkdir -p target/dist
+          rustup target add x86_64-apple-darwin
+          cargo build --release --target x86_64-apple-darwin -p book-searcher
+          cd target/x86_64-apple-darwin/release && zip book-searcher-x86_64-apple-darwin.zip book-searcher && cp book-searcher-x86_64-apple-darwin.zip ../../dist/ && cd ../../../
+          rustup target add aarch64-apple-darwin
+          cargo build --release --target aarch64-apple-darwin -p book-searcher
+          cd target/aarch64-apple-darwin/release && zip book-searcher-aarch64-apple-darwin.zip book-searcher && cp book-searcher-aarch64-apple-darwin.zip ../../dist/ && cd ../../../
+      - name: Build on Windows
+        if: matrix.platform == 'windows-latest'
+        run: |
+          mkdir -p target/dist
+          rustup target add x86_64-pc-windows-msvc
+          cargo build --release --target x86_64-pc-windows-msvc -p book-searcher
+          cd target/x86_64-pc-windows-msvc/release && Compress-Archive -Path book-searcher.exe -DestinationPath book-searcher-x86_64-pc-windows-msvc.zip && cp book-searcher-x86_64-pc-windows-msvc.zip ../../dist/ && cd ../../../
+      - name: Upload Github Assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            target/dist/*
+            release/*
+          prerelease: ${{ contains(github.ref, '-') }}

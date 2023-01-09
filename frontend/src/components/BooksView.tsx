@@ -6,21 +6,25 @@ import {
   CardFooter,
   CardHeader,
   Divider,
+  Flex,
   GridItem,
   Heading,
-  Link,
+  Icon,
   SimpleGrid,
   TableContainer,
   Tag,
   Text
 } from '@chakra-ui/react';
 import { FilterFn, createColumnHelper } from '@tanstack/react-table';
+import React, { useContext } from 'react';
 
 import { Book } from '../scripts/searcher';
 import DataTable from './DataTable';
 import ExternalLink from './ExternalLink';
-import React from 'react';
+import RootContext from '../store';
+import { TbChevronUp } from 'react-icons/tb';
 import { filesize as formatFileSize } from 'filesize';
+import getIpfsGateways from '../scripts/ipfs';
 import { useTranslation } from 'react-i18next';
 
 const columnHelper = createColumnHelper<Book>();
@@ -44,16 +48,9 @@ const arrFilter: FilterFn<Book> = (row, columnId, filterValue: string[]) => {
   return filterValue.includes(value);
 };
 
-const ipfsGateways: string[] = [
-  'cloudflare-ipfs.com',
-  'dweb.link',
-  'ipfs.io',
-  'gateway.pinata.cloud'
-];
-
-function downloadLinkFromIPFS(gateway: string, book: Book, schema: string = 'https') {
+function downloadLinkFromIPFS(gateway: string, book: Book) {
   return (
-    `${schema}://${gateway}/ipfs/${book.ipfs_cid}?filename=` +
+    `${gateway}/ipfs/${book.ipfs_cid}?filename=` +
     encodeURIComponent(`${book.title}_${book.author}.${book.extension}`)
   );
 }
@@ -80,6 +77,13 @@ export interface BooksViewProps {
 
 const BooksView: React.FC<BooksViewProps> = ({ books }) => {
   const { t } = useTranslation();
+  const rootContext = useContext(RootContext);
+
+  React.useEffect(() => {
+    getIpfsGateways().then((gateways) => {
+      rootContext.setIpfsGateways(gateways);
+    });
+  }, []);
 
   const columns = React.useMemo(
     () => [
@@ -87,20 +91,20 @@ const BooksView: React.FC<BooksViewProps> = ({ books }) => {
         header: t('book.title') ?? 'Title',
         sortingFn: 'text',
         enableColumnFilter: false,
-        meta: { width: '20%' }
+        meta: { width: '30%' }
       }),
       columnHelper.accessor('author', {
         header: t('book.author') ?? 'Author',
         sortingFn: 'text',
         enableColumnFilter: false,
-        meta: { width: '20%' }
+        meta: { width: '15%' }
       }),
       columnHelper.accessor('publisher', {
         header: t('book.publisher') ?? 'Publisher',
         sortingFn: 'text',
         sortUndefined: 1,
         enableColumnFilter: false,
-        meta: { width: '20%', breakpoint: 'md' }
+        meta: { width: '15%', breakpoint: 'md' }
       }),
       columnHelper.accessor(
         'extension',
@@ -184,7 +188,7 @@ const BooksView: React.FC<BooksViewProps> = ({ books }) => {
   const languages = [...new Set(books.map((book) => book.language.toLowerCase()))].sort();
 
   return (
-    <TableContainer px={8} my={4} overflowY="unset">
+    <TableContainer px={{ base: 4, md: 8 }} my={{ base: 2, md: 4 }} overflowY="unset">
       <DataTable
         data={data}
         columns={columns}
@@ -206,7 +210,7 @@ const BooksView: React.FC<BooksViewProps> = ({ books }) => {
             ipfs_cid
           } = row.original;
           return (
-            <Card mt={2} mb={4} mx={8}>
+            <Card mt={{ base: 1, md: 2 }} mb={{ base: 2, md: 4 }} mx={{ base: 4, md: 8 }}>
               <CardHeader>
                 <Heading as="h3" fontSize="xl">
                   {title}
@@ -214,8 +218,8 @@ const BooksView: React.FC<BooksViewProps> = ({ books }) => {
               </CardHeader>
               <Divider />
               <CardBody>
-                <SimpleGrid columns={{ sm: 1, md: 3, lg: 4 }} spacing={4}>
-                  <Description name={`${t('book.id') ?? 'zlib/libgen id'}: `}>{id}</Description>
+                <SimpleGrid columns={{ sm: 1, md: 3, lg: 4 }} spacing={{ base: 2, md: 4 }}>
+                  <Description name={`${t('book.id') ?? 'ID'}: `}>{id}</Description>
                   <GridItem colSpan={{ sm: 1, md: 2, lg: 3 }}>
                     <Description name={`${t('book.ipfs_cid') ?? 'IPFS CID'}: `}>
                       {ipfs_cid}
@@ -247,26 +251,33 @@ const BooksView: React.FC<BooksViewProps> = ({ books }) => {
                   </Description>
                 </SimpleGrid>
               </CardBody>
-              <CardFooter>
-                <SimpleGrid columns={{ sm: 2, md: 3, lg: 4, xl: 5 }} spacing={4}>
-                  {ipfsGateways.map((gateway) => (
-                    <Button
-                      as={ExternalLink}
-                      href={downloadLinkFromIPFS(gateway, row.original)}
-                      key={gateway}
-                      variant="outline"
-                    >
-                      {gateway}
-                    </Button>
-                  ))}
+              <CardFooter flexDirection="column">
+                {rootContext.ipfsGateways.length > 0 ? (
+                  <SimpleGrid columns={{ sm: 2, md: 3, lg: 4, xl: 5 }} spacing={{ base: 2, md: 4 }}>
+                    {rootContext.ipfsGateways.map((gateway) => (
+                      <Button
+                        as={ExternalLink}
+                        href={downloadLinkFromIPFS(gateway, row.original)}
+                        key={gateway}
+                        variant="outline"
+                      >
+                        {gateway}
+                      </Button>
+                    ))}
+                  </SimpleGrid>
+                ) : null}
+                <Flex justify="flex-end">
                   <Button
-                    as={ExternalLink}
-                    href={downloadLinkFromIPFS('localhost:8080', row.original, 'http')}
-                    variant="outline"
+                    variant="unstyled"
+                    onClick={() => row.toggleExpanded(false)}
+                    color="gray.500"
+                    mt={2}
+                    mb={-2}
                   >
-                    localhost:8080
+                    {t('table.collapse')}
+                    <Icon as={TbChevronUp} boxSize={4} position="relative" top={0.5} left={1} />
                   </Button>
-                </SimpleGrid>
+                </Flex>
               </CardFooter>
             </Card>
           );
